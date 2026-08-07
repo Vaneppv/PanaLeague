@@ -312,6 +312,51 @@ footer .db-status.error {
   }
 }
 
+/* Filtros: el panel lateral se apila encima de los resultados */
+@media (max-width: 768px) {
+  .players-layout,
+  .matches-layout {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .filter-panel {
+    width: 100%;
+    max-width: none;
+    flex: none;
+    position: static;
+  }
+
+  .filter-input,
+  .filter-select {
+    max-width: 100%;
+  }
+}
+
+/* Formularios en diálogos: inputs apilados para que no desborden */
+@media (max-width: 640px) {
+  .form-row {
+    flex-direction: column;
+  }
+
+  .event-minute-group {
+    flex: none;
+  }
+
+  .event-form .btn {
+    align-self: stretch;
+  }
+}
+
+/* Móvil muy estrecho: diálogos sin ancho mínimo fijo */
+@media (max-width: 420px) {
+  .league-form-dialog,
+  .player-form-dialog {
+    min-width: 0;
+    width: 92%;
+  }
+}
+
 .btn {
   display: inline-flex;
   align-items: center;

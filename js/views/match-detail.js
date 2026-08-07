@@ -69,6 +69,9 @@ export class MatchDetailView {
     const loader = container.querySelector("loading-state");
     if (loader) loader.remove();
 
+    const existing = container.querySelector(".match-detail");
+    if (existing) existing.remove();
+
     const section = document.createElement("section");
     section.className = "match-detail";
 
