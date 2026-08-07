@@ -247,6 +247,44 @@ footer .db-status.error {
   text-shadow: 0 0 6px rgba(248, 113, 113, 0.4);
 }
 
+/* Botón toggle del panel de filtros (solo visible en móvil) */
+.filter-toggle {
+  display: none;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.55rem 0.8rem;
+  background: var(--surface);
+  color: var(--accent-soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.filter-toggle:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.3);
+}
+
+.filter-toggle::after {
+  content: "▾";
+  margin-left: auto;
+  color: var(--text-muted);
+}
+
+.filter-panel-wrap.open .filter-toggle::after {
+  content: "▴";
+}
+
+.filter-toggle .filter-count {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
 /* ===== Responsividad ===== */
 
 /* Móvil / tablet: navbar colapsado con menú hamburguesa */
@@ -312,12 +350,21 @@ footer .db-status.error {
   }
 }
 
-/* Filtros: el panel lateral se apila encima de los resultados */
+/* Filtros: el panel se apila sobre los resultados y colapsa en acordeón */
 @media (max-width: 768px) {
   .players-layout,
   .matches-layout {
     flex-direction: column;
     gap: 1rem;
+  }
+
+  .filter-panel-wrap {
+    width: 100%;
+    flex: none;
+  }
+
+  .filter-toggle {
+    display: inline-flex;
   }
 
   .filter-panel {
@@ -327,9 +374,31 @@ footer .db-status.error {
     position: static;
   }
 
+  .filter-panel-wrap:not(.open) .filter-panel {
+    display: none;
+  }
+
   .filter-input,
   .filter-select {
     max-width: 100%;
+  }
+}
+
+/* Header de vistas: botón de acción compacto junto al título */
+@media (max-width: 600px) {
+  .page-header {
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.2rem;
+  }
+
+  .page-header .btn {
+    padding: 0.4rem 0.65rem;
+    font-size: 0.8rem;
   }
 }
 

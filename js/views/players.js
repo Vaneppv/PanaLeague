@@ -20,7 +20,28 @@ export class PlayersView {
     const filterPanel = document.createElement("aside");
     filterPanel.className = "filter-panel";
     filterPanel.id = "player-filters";
-    filterPanel.style.display = "none";
+
+    const filterWrap = document.createElement("div");
+    filterWrap.className = "filter-panel-wrap";
+
+    const filterToggle = document.createElement("button");
+    filterToggle.className = "filter-toggle";
+    filterToggle.type = "button";
+    filterToggle.setAttribute("aria-expanded", "false");
+    filterToggle.addEventListener("click", () => {
+      const open = filterWrap.classList.toggle("open");
+      filterToggle.setAttribute("aria-expanded", String(open));
+    });
+
+    const toggleLabel = document.createElement("span");
+    toggleLabel.textContent = "Filtros";
+    const toggleCount = document.createElement("span");
+    toggleCount.className = "filter-count";
+    filterToggle.appendChild(toggleLabel);
+    filterToggle.appendChild(toggleCount);
+
+    filterWrap.appendChild(filterToggle);
+    filterWrap.appendChild(filterPanel);
 
     const filterTitle = document.createElement("h2");
     filterTitle.textContent = "Filtros";
@@ -111,7 +132,7 @@ export class PlayersView {
 
     resultsSection.appendChild(header);
     resultsSection.appendChild(loader);
-    layout.appendChild(filterPanel);
+    layout.appendChild(filterWrap);
     layout.appendChild(resultsSection);
     container.appendChild(layout);
 
@@ -159,11 +180,13 @@ export class PlayersView {
     if (loader) loader.remove();
 
     const filters = this.container.querySelector("#player-filters");
+    const filterWrap = this.container.querySelector(".filter-panel-wrap");
     const teamFilter = this.container.querySelector("#filter-team");
     const positionFilter = this.container.querySelector("#filter-position");
 
+    if (filterWrap) filterWrap.style.display = teams.length ? "" : "none";
+
     if (filters && teams.length > 0) {
-      filters.style.display = "block";
 
       const pendingTeam = this.pendingFilters?.team;
       const currentTeamValue = pendingTeam != null ? pendingTeam : teamFilter.value;
@@ -208,6 +231,8 @@ export class PlayersView {
     const searchVal = this.container.querySelector("#filter-search")?.value?.toLowerCase() || "";
     const teamVal = this.container.querySelector("#filter-team")?.value || "";
     const posVal = this.container.querySelector("#filter-position")?.value || "";
+
+    this.#updateFilterCount(searchVal, teamVal, posVal);
 
     const filtered = this.#filterPlayers(allPlayers, searchVal, teamVal, posVal);
 
@@ -301,6 +326,14 @@ export class PlayersView {
       if (position && p.position !== position) return false;
       return true;
     });
+  }
+
+  // Refleja en el toggle cuántos filtros están activos (p. ej. "Filtros · 2").
+  #updateFilterCount(searchVal, teamVal, posVal) {
+    const el = this.container?.querySelector(".filter-panel-wrap .filter-count");
+    if (!el) return;
+    const active = [searchVal, teamVal, posVal].filter(Boolean).length;
+    el.textContent = active ? `· ${active}` : "";
   }
 
   async #deletePlayer(e, playerId, playerHasEvents) {

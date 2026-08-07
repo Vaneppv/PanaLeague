@@ -87,11 +87,33 @@ export class MatchesView {
     layout.appendChild(this.#buildResults());
     section.appendChild(layout);
 
+    this.#updateFilterCount();
     container.appendChild(section);
   }
 
   // Filtros: estado, equipo, fecha (desde/hasta) y ronda en torneo.
   #buildFilters() {
+    const wrap = document.createElement("div");
+    wrap.className = "filter-panel-wrap";
+
+    const toggle = document.createElement("button");
+    toggle.className = "filter-toggle";
+    toggle.type = "button";
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.addEventListener("click", () => {
+      const open = wrap.classList.toggle("open");
+      toggle.setAttribute("aria-expanded", String(open));
+    });
+
+    const toggleLabel = document.createElement("span");
+    toggleLabel.textContent = "Filtros";
+    const toggleCount = document.createElement("span");
+    toggleCount.className = "filter-count";
+    toggle.appendChild(toggleLabel);
+    toggle.appendChild(toggleCount);
+
+    wrap.appendChild(toggle);
+
     const panel = document.createElement("aside");
     panel.className = "filter-panel";
 
@@ -105,6 +127,7 @@ export class MatchesView {
     clear.addEventListener("click", () => {
       this.filters = { status: "all", teamId: "all", round: "all", from: "", to: "" };
       this.#refreshResults();
+      this.#updateFilterCount();
     });
     panel.appendChild(clear);
 
@@ -140,7 +163,8 @@ export class MatchesView {
       panel.appendChild(this.#filterSelect("Ronda", "round", roundOptions));
     }
 
-    return panel;
+    wrap.appendChild(panel);
+    return wrap;
   }
 
   // Grupo de filtro genérico: label + select con opciones.
@@ -163,6 +187,7 @@ export class MatchesView {
     sel.addEventListener("change", () => {
       this.filters[name] = sel.value;
       this.#refreshResults();
+      this.#updateFilterCount();
     });
 
     group.appendChild(lbl);
@@ -185,6 +210,7 @@ export class MatchesView {
     input.addEventListener("change", () => {
       this.filters[name] = input.value;
       this.#refreshResults();
+      this.#updateFilterCount();
     });
 
     group.appendChild(lbl);
@@ -314,6 +340,21 @@ export class MatchesView {
     const slot = this.container.querySelector(".results-section");
     if (!slot) return;
     slot.replaceChildren(this.#buildResults());
+  }
+
+  // Refleja en el toggle cuántos filtros están activos (p. ej. "Filtros · 2").
+  #updateFilterCount() {
+    const el = this.container?.querySelector(".filter-panel-wrap .filter-count");
+    if (!el) return;
+    const f = this.filters;
+    const active = [
+      f.status !== "all" ,
+      f.teamId !== "all",
+      f.round !== "all",
+      Boolean(f.from),
+      Boolean(f.to),
+    ].filter(Boolean).length;
+    el.textContent = active ? `· ${active}` : "";
   }
 
   // Diálogo crear/editar partido (solo modalidad liga) o editar fecha
