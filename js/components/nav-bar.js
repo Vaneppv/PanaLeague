@@ -7,6 +7,7 @@ export class NavBar extends HTMLElement {
     this.buildDOM();
     this.updateActiveLink();
     window.addEventListener("hashchange", () => this.updateActiveLink());
+    window.addEventListener("hashchange", () => this.#closeMenu());
     document.addEventListener("league:changed", () => this.#syncLeague());
     this.#syncLeague();
   }
@@ -46,6 +47,17 @@ export class NavBar extends HTMLElement {
     leagueIndicator.title = "Liga activa";
     logo.appendChild(leagueIndicator);
 
+    const toggle = document.createElement("button");
+    toggle.className = "nav-toggle";
+    toggle.type = "button";
+    toggle.setAttribute("aria-label", "Abrir menú de navegación");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.innerHTML =
+      '<span class="nav-toggle-bar"></span>' +
+      '<span class="nav-toggle-bar"></span>' +
+      '<span class="nav-toggle-bar"></span>';
+    toggle.addEventListener("click", () => this.#toggleMenu());
+
     const ul = document.createElement("ul");
     ul.className = "nav-links";
     const links = [
@@ -61,13 +73,37 @@ export class NavBar extends HTMLElement {
       const a = document.createElement("a");
       a.href = href;
       a.textContent = label;
+      a.addEventListener("click", () => this.#closeMenu());
       li.appendChild(a);
       ul.appendChild(li);
     });
 
     nav.appendChild(logo);
     nav.appendChild(ul);
+    nav.appendChild(toggle);
     this.appendChild(nav);
+  }
+
+  #toggleMenu() {
+    const nav = this.querySelector("#navbar");
+    const isOpen = nav.classList.toggle("open");
+    const toggle = this.querySelector(".nav-toggle");
+    toggle.setAttribute("aria-expanded", String(isOpen));
+    toggle.setAttribute(
+      "aria-label",
+      isOpen ? "Cerrar menú de navegación" : "Abrir menú de navegación",
+    );
+  }
+
+  #closeMenu() {
+    const nav = this.querySelector("#navbar");
+    if (!nav) return;
+    nav.classList.remove("open");
+    const toggle = this.querySelector(".nav-toggle");
+    if (toggle) {
+      toggle.setAttribute("aria-expanded", "false");
+      toggle.setAttribute("aria-label", "Abrir menú de navegación");
+    }
   }
 
   updateActiveLink() {

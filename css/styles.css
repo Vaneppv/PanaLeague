@@ -187,6 +187,35 @@ nav-bar {
   box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.5);
 }
 
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.nav-toggle:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.3);
+}
+
+.nav-toggle-bar {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: var(--accent-soft);
+  border-radius: 2px;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
 #app {
   flex: 1;
   padding: 1.5rem;
@@ -216,6 +245,71 @@ footer .db-status {
 footer .db-status.error {
   color: #f87171;
   text-shadow: 0 0 6px rgba(248, 113, 113, 0.4);
+}
+
+/* ===== Responsividad ===== */
+
+/* Móvil / tablet: navbar colapsado con menú hamburguesa */
+@media (max-width: 768px) {
+  #navbar {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 56px;
+    padding: 0.6rem 1rem;
+    gap: 0.5rem;
+  }
+
+  #navbar .logo {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .league-indicator {
+    max-width: 140px;
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+  }
+
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    gap: 0.15rem;
+    padding-top: 0.25rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .nav-links a {
+    display: block;
+    padding: 0.6rem 0.75rem;
+  }
+
+  #navbar.open .nav-links {
+    display: flex;
+  }
+
+  #navbar.open .nav-toggle-bar:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  #navbar.open .nav-toggle-bar:nth-child(2) {
+    opacity: 0;
+  }
+
+  #navbar.open .nav-toggle-bar:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+}
+
+/* Móvil pequeño: footer apilado */
+@media (max-width: 600px) {
+  footer {
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem 1rem;
+  }
 }
 
 .btn {
