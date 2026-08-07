@@ -3,220 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lenguaje de Clientes Web · Curso</title>
-    <link rel="stylesheet" type="text/css" href="./assets/base.css" />
-    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
-    <style>
-      /* Tema del curso — azul-petróleo institucional */
-      :root {
-        --primary: #005577;
-        --primary-dark: #003e57;
-        --accent: #0099cc;
-        --secondary: #0070ba;
-      }
-
-      .clases-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 1.5rem;
-        margin: 2rem 0;
-      }
-      .clase-card {
-        background: var(--card);
-        border-radius: var(--radius-lg);
-        padding: 1.5rem;
-        box-shadow: var(--shadow);
-        text-decoration: none;
-        color: var(--text);
-        transition:
-          transform 0.2s,
-          box-shadow 0.2s;
-        border-top: 6px solid var(--accent);
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-      }
-      .clase-card:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-lg);
-      }
-      .clase-num {
-        font-size: 0.8rem;
-        color: var(--muted);
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        font-weight: bold;
-      }
-      .clase-card h2 {
-        margin: 0;
-        color: var(--primary);
-        font-size: 1.3rem;
-      }
-      .clase-card p {
-        margin: 0;
-        color: var(--muted);
-        font-size: 0.95rem;
-      }
-      .clase-card .topics {
-        margin-top: 0.5rem;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.3rem;
-      }
-      .clase-card .topics span {
-        background: rgba(0, 153, 204, 0.1);
-        color: var(--primary);
-        padding: 0.2rem 0.55rem;
-        border-radius: 999px;
-        font-size: 0.75rem;
-        font-weight: bold;
-      }
-      .clase-card.wip {
-        opacity: 0.65;
-        pointer-events: none;
-      }
-      .clase-card.wip::after {
-        content: "Próximamente";
-        align-self: flex-start;
-        background: var(--warning);
-        color: white;
-        padding: 0.2rem 0.6rem;
-        border-radius: 4px;
-        font-size: 0.7rem;
-        font-weight: bold;
-        letter-spacing: 0.5px;
-        margin-top: 0.5rem;
-      }
-
-      /* Colores por clase (border-top) */
-      .clase-card.c2 {
-        border-top-color: #0099cc;
-      }
-      .clase-card.c3 {
-        border-top-color: #f7df1e;
-      }
-      .clase-card.c4 {
-        border-top-color: #e84393;
-      }
-      .clase-card.c5 {
-        border-top-color: #6c5ce7;
-      }
-      .clase-card.c6 {
-        border-top-color: #00b894;
-      }
-      .clase-card.git {
-        border-top-color: #f05033;
-      }
-
-      .intro {
-        background: var(--card);
-        border-radius: var(--radius);
-        padding: 1.5rem;
-        box-shadow: var(--shadow);
-        margin-bottom: 2rem;
-        border-left: 5px solid var(--primary);
-      }
-      .intro h2 {
-        margin-top: 0;
-        color: var(--primary);
-        font-size: 1.1rem;
-      }
-      .intro p {
-        margin: 0.5rem 0;
-      }
-    </style>
+    <title>PanaLeague</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/teams.css" />
+    <link rel="stylesheet" href="css/players.css" />
+    <link rel="stylesheet" href="css/detail.css" />
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <link rel="stylesheet" href="css/stats.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script type="module" src="js/app.js" defer></script>
   </head>
   <body>
-    <div class="container">
-      <header class="hero" data-deco="&lt;/&gt;">
-        <h1>Lenguaje de Clientes Web</h1>
-        <p>Curso completo · Ing. Victor Kneider · URU</p>
-      </header>
-
-      <div class="intro">
-        <h2>👋 Bienvenido</h2>
-        <p>
-          Cada clase tiene su <strong>teoría</strong>, sus
-          <strong>retos prácticos</strong> y un
-          <strong>ejercicio integrador</strong>. La idea no es solo leer:
-          cópialo, rómpelo, rehazlo. Esa es la única forma de aprender a
-          programar para la web.
-        </p>
-      </div>
-
-      <h2 style="margin-bottom: 0">📚 Clases del curso</h2>
-
-      <div class="clases-grid">
-        <a class="clase-card c2" href="Clase-2-HTML-CSS/index.html">
-          <span class="clase-num">Clase 2</span>
-          <h2>HTML &amp; CSS</h2>
-          <p>Estructura y estilo: los pilares de toda interfaz web.</p>
-          <div class="topics">
-            <span>HTML</span><span>CSS</span><span>Flexbox</span
-            ><span>Grid</span>
-          </div>
-        </a>
-
-        <a class="clase-card c3" href="Clase-3-JAVASCRIPT/index.html">
-          <span class="clase-num">Clase 3</span>
-          <h2>JavaScript</h2>
-          <p>Lógica del navegador: variables, funciones, DOM y eventos.</p>
-          <div class="topics">
-            <span>Basics</span><span>DOM</span><span>Eventos</span
-            ><span>JSON</span>
-          </div>
-        </a>
-
-        <a class="clase-card c4" href="Clase-4-ASINCRONIA/index.html">
-          <span class="clase-num">Clase 4</span>
-          <h2>Asincronía</h2>
-          <p>Callbacks, promesas, async/await y peticiones HTTP con Fetch.</p>
-          <div class="topics">
-            <span>Promises</span><span>async/await</span><span>Fetch</span
-            ><span>PokeAPI</span>
-          </div>
-        </a>
-
-        <a class="clase-card c5" href="Clase-5-COMPONENTES/index.html">
-          <span class="clase-num">Clase 5</span>
-          <h2>Componentes</h2>
-          <p>
-            Encapsular UI reutilizable: progresión de 5 pasos hasta Custom
-            Elements.
-          </p>
-          <div class="topics">
-            <span>Clases JS</span><span>Estado</span><span>HTMLElement</span
-            ><span>Custom Elements</span>
-          </div>
-        </a>
-
-        <a class="clase-card c6" href="Clase-6-PERSISTENCIA/index.html">
-          <span class="clase-num">Clase 6</span>
-          <h2>Persistencia</h2>
-          <p>Guardar datos en el navegador: LocalStorage e IndexedDB.</p>
-          <div class="topics">
-            <span>LocalStorage</span><span>IndexedDB</span
-            ><span>Offline-first</span>
-          </div>
-        </a>
-
-        <a class="clase-card git" href="GIT/index.html">
-          <span class="clase-num">Extra</span>
-          <h2>Git &amp; GitHub</h2>
-          <p>
-            8 hacks progresivos para dominar Git, GitHub y crear tu repo
-            personal de la materia.
-          </p>
-          <div class="topics">
-            <span>CLI</span><span>Branches</span><span>GitHub</span>
-          </div>
-        </a>
-      </div>
-
-      <footer class="site-footer">
-        Lenguaje de Clientes Web · Ing. Victor Kneider · URU
-        <span><a href="./mihtml.html">Mira mi página bonita</a></span>
-      </footer>
-    </div>
+    <nav-bar></nav-bar>
+    <main id="app"></main>
+    <footer>
+      <p>PanaLeague &copy; 2026 — Jonner Paz y Vanessa Pérez</p>
+      <span id="db-status" class="db-status"></span>
+    </footer>
   </body>
 </html>
