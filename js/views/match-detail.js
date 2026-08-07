@@ -79,12 +79,14 @@ export class MatchDetailView {
       this.#buildHeader(match, homeTeam, awayTeam, league, allTeams.length, homeScore, awayScore),
     );
 
+    const readOnly = match.status === "Finalizado";
+    section.appendChild(
+      this.#buildEvents(match, homeTeam, awayTeam, homePlayers, awayPlayers, events, playerById, terms, homeScore, awayScore, readOnly),
+    );
+
     if (match.status === "Finalizado") {
       section.appendChild(this.#buildUndo(match));
     } else {
-      section.appendChild(
-        this.#buildEvents(match, homeTeam, awayTeam, homePlayers, awayPlayers, events, playerById, terms, homeScore, awayScore),
-      );
       section.appendChild(
         this.#buildActions(match, homeTeam, awayTeam, homeScore, awayScore, isTournament),
       );
@@ -147,8 +149,10 @@ export class MatchDetailView {
     return header;
   }
 
-  // Registro de eventos en dos columnas (local | visitante) con EventForm.
-  #buildEvents(match, homeTeam, awayTeam, homePlayers, awayPlayers, events, playerById, terms, homeScore, awayScore) {
+  // Registro de eventos en dos columnas (local | visitante). En modo
+  // solo-lectura (partido finalizado) no se muestran el formulario ni
+  // los botones de borrado.
+  #buildEvents(match, homeTeam, awayTeam, homePlayers, awayPlayers, events, playerById, terms, homeScore, awayScore, readOnly) {
     const wrap = document.createElement("div");
     wrap.className = "events-section";
 
@@ -158,10 +162,20 @@ export class MatchDetailView {
 
     const grid = document.createElement("div");
     grid.className = "events-grid";
-    grid.appendChild(this.#eventColumn(homeTeam, events, playerById, homeScore));
-    grid.appendChild(this.#eventColumn(awayTeam, events, playerById, awayScore));
+    grid.appendChild(this.#eventColumn(homeTeam, events, playerById, homeScore, readOnly));
+    grid.appendChild(this.#eventColumn(awayTeam, events, playerById, awayScore, readOnly));
     wrap.appendChild(grid);
 
+    if (!readOnly) {
+      wrap.appendChild(
+        this.#buildEventForm(match, homeTeam, awayTeam, homePlayers, awayPlayers, terms),
+      );
+    }
+
+    return wrap;
+  }
+
+  #buildEventForm(match, homeTeam, awayTeam, homePlayers, awayPlayers, terms) {
     const form = document.createElement("event-form");
     form.data = { match, homeTeam, awayTeam, homePlayers, awayPlayers, terms };
     form.addEventListener("event-added", async (e) => {
@@ -174,13 +188,11 @@ export class MatchDetailView {
         showToast("No se pudo registrar la anotación", "error");
       }
     });
-    wrap.appendChild(form);
-
-    return wrap;
+    return form;
   }
 
-  // Columna de eventos de un equipo con borrado individual.
-  #eventColumn(team, events, playerById, score) {
+  // Columna de eventos de un equipo. Con readOnly se oculta el borrado.
+  #eventColumn(team, events, playerById, score, readOnly) {
     const col = document.createElement("div");
     col.className = "event-column";
 
@@ -210,19 +222,21 @@ export class MatchDetailView {
           (ev.minute != null ? ` · ${ev.minute}'` : "");
         li.appendChild(label);
 
-        const del = document.createElement("button");
-        del.className = "btn btn-sm btn-danger";
-        del.textContent = "✕";
-        del.title = "Eliminar anotación";
-        del.addEventListener("click", async () => {
-          try {
-            await db.remove("events", ev.id);
-            this.render();
-          } catch (err) {
-            showToast("No se pudo eliminar la anotación", "error");
-          }
-        });
-        li.appendChild(del);
+        if (!readOnly) {
+          const del = document.createElement("button");
+          del.className = "btn btn-sm btn-danger";
+          del.textContent = "✕";
+          del.title = "Eliminar anotación";
+          del.addEventListener("click", async () => {
+            try {
+              await db.remove("events", ev.id);
+              this.render();
+            } catch (err) {
+              showToast("No se pudo eliminar la anotación", "error");
+            }
+          });
+          li.appendChild(del);
+        }
 
         list.appendChild(li);
       });
