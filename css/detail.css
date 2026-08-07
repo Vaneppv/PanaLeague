@@ -270,6 +270,22 @@
   padding: 1rem;
 }
 
+chart-container,
+.chart-wrapper canvas {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+}
+
+chart-container {
+  position: relative;
+  height: 100%;
+}
+
+.chart-wrapper canvas {
+  height: 100%;
+}
+
 /* Match detail (V-08) */
 .match-detail {
   display: flex;
