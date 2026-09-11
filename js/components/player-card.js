@@ -90,6 +90,18 @@ export class PlayerCard extends HTMLElement {
       info.appendChild(teamRow);
     }
 
+    if (d.activo === false) {
+      const badge = document.createElement('span');
+      badge.className = 'player-inactive-badge';
+      badge.textContent = 'Inactivo';
+      info.appendChild(badge);
+    } else {
+      const badge = document.createElement('span');
+      badge.className = 'player-active-badge';
+      badge.textContent = 'Activo';
+      info.appendChild(badge);
+    }
+
     this.appendChild(imgContainer);
     this.appendChild(info);
   }

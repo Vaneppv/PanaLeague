@@ -36,14 +36,14 @@ const LEAGUE1_TEAMS = [
 ];
 
 const LEAGUE1_PLAYERS = [
-  { teamIdx: 0, name: "Mario Luna", position: "Delantero", number: 9 },
-  { teamIdx: 0, name: "Pablo Ríos", position: "Portero", number: 1 },
-  { teamIdx: 1, name: "Diego Sotil", position: "Delantero", number: 10 },
-  { teamIdx: 1, name: "Luis Campos", position: "Centrocampista", number: 8 },
-  { teamIdx: 2, name: "Juan Mita", position: "Delantero", number: 11 },
-  { teamIdx: 2, name: "Raúl Quispe", position: "Defensa", number: 4 },
-  { teamIdx: 3, name: "Alan Torres", position: "Centrocampista", number: 6 },
-  { teamIdx: 3, name: "Iván Ccopa", position: "Portero", number: 1 },
+  { teamIdx: 0, name: "Mario Luna", position: "Delantero", number: 9, cedula: "1234567890", fechaNacimiento: "1985-03-15", activo: true },
+  { teamIdx: 0, name: "Pablo Ríos", position: "Portero", number: 1, cedula: "0987654321", fechaNacimiento: "1988-07-22", activo: true },
+  { teamIdx: 1, name: "Diego Sotil", position: "Delantero", number: 10, cedula: "1122334455", fechaNacimiento: "1990-11-05", activo: true },
+  { teamIdx: 1, name: "Luis Campos", position: "Centrocampista", number: 8, cedula: "5566778899", fechaNacimiento: "1982-01-30", activo: true },
+  { teamIdx: 2, name: "Juan Mita", position: "Delantero", number: 11, cedula: "9988776655", fechaNacimiento: "1995-06-18", activo: true },
+  { teamIdx: 2, name: "Raúl Quispe", position: "Defensa", number: 4, cedula: "4433221100", fechaNacimiento: "1978-09-12", activo: true },
+  { teamIdx: 3, name: "Alan Torres", position: "Centrocampista", number: 6, cedula: "6655443322", fechaNacimiento: "1992-04-25", activo: true },
+  { teamIdx: 3, name: "Iván Ccopa", position: "Portero", number: 1, cedula: "7788990011", fechaNacimiento: "1987-12-08", activo: true },
 ];
 
 const LEAGUE1_MATCHES = [
@@ -73,14 +73,14 @@ const LEAGUE2_TEAMS = [
 ];
 
 const LEAGUE2_PLAYERS = [
-  { teamIdx: 0, name: "Marco Salas", position: "Base", number: 4 },
-  { teamIdx: 0, name: "Bruno Vega", position: "Pívot", number: 15 },
-  { teamIdx: 1, name: "César Palacios", position: "Escolta", number: 7 },
-  { teamIdx: 1, name: "Renzo Alarcón", position: "Alero", number: 12 },
-  { teamIdx: 2, name: "Félix Ñahui", position: "Pívot", number: 20 },
-  { teamIdx: 2, name: "Paulo Huerta", position: "Base", number: 5 },
-  { teamIdx: 3, name: "Jorge Ríos", position: "Alero", number: 8 },
-  { teamIdx: 3, name: "Cristian Soto", position: "Escolta", number: 10 },
+  { teamIdx: 0, name: "Marco Salas", position: "Base", number: 4, cedula: "1111111111", fechaNacimiento: "1993-02-14", activo: true },
+  { teamIdx: 0, name: "Bruno Vega", position: "Pívot", number: 15, cedula: "2222222222", fechaNacimiento: "1986-08-20", activo: true },
+  { teamIdx: 1, name: "César Palacios", position: "Escolta", number: 7, cedula: "3333333333", fechaNacimiento: "1991-05-03", activo: true },
+  { teamIdx: 1, name: "Renzo Alarcón", position: "Alero", number: 12, cedula: "4444444444", fechaNacimiento: "1989-10-17", activo: true },
+  { teamIdx: 2, name: "Félix Ñahui", position: "Pívot", number: 20, cedula: "5555555555", fechaNacimiento: "1994-12-01", activo: true },
+  { teamIdx: 2, name: "Paulo Huerta", position: "Base", number: 5, cedula: "6666666666", fechaNacimiento: "1984-03-28", activo: true },
+  { teamIdx: 3, name: "Jorge Ríos", position: "Alero", number: 8, cedula: "7777777777", fechaNacimiento: "1996-07-09", activo: true },
+  { teamIdx: 3, name: "Cristian Soto", position: "Escolta", number: 10, cedula: "8888888888", fechaNacimiento: "1983-01-25", activo: true },
 ];
 
 const LEAGUE2_MATCHES = [

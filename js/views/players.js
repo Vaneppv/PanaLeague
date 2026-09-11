@@ -55,6 +55,7 @@ export class PlayersView {
       this.container.querySelector("#filter-search").value = "";
       this.container.querySelector("#filter-team").value = "";
       this.container.querySelector("#filter-position").value = "";
+      this.container.querySelector("#filter-activo").value = "";
       this.render();
     });
     filterPanel.appendChild(clearBtn);
@@ -105,6 +106,30 @@ export class PlayersView {
     posGroup.appendChild(posSelect);
     filterPanel.appendChild(posGroup);
 
+    const activoGroup = document.createElement("div");
+    activoGroup.className = "filter-group";
+    const activoLabel = document.createElement("label");
+    activoLabel.textContent = "Estado";
+    activoGroup.appendChild(activoLabel);
+    const activoSelect = document.createElement("select");
+    activoSelect.id = "filter-activo";
+    activoSelect.className = "filter-select";
+    const activoDefault = document.createElement("option");
+    activoDefault.value = "";
+    activoDefault.textContent = "Todos";
+    activoSelect.appendChild(activoDefault);
+    const activoTrue = document.createElement("option");
+    activoTrue.value = "true";
+    activoTrue.textContent = "Activo";
+    activoSelect.appendChild(activoTrue);
+    const activoFalse = document.createElement("option");
+    activoFalse.value = "false";
+    activoFalse.textContent = "Inactivo";
+    activoSelect.appendChild(activoFalse);
+    activoSelect.addEventListener("change", () => this.render());
+    activoGroup.appendChild(activoSelect);
+    filterPanel.appendChild(activoGroup);
+
     const resultsSection = document.createElement("section");
     resultsSection.className = "results-section";
     this.resultsSection = resultsSection;
@@ -143,6 +168,9 @@ export class PlayersView {
     this.pendingFilters = saved?.filters || null;
     if (this.pendingFilters?.search != null) {
       searchInput.value = this.pendingFilters.search;
+    }
+    if (this.pendingFilters?.activo != null) {
+      this.container.querySelector("#filter-activo").value = this.pendingFilters.activo;
     }
     this.pendingScroll = saved?.scrollTop ?? null;
     clearListState("/players");
@@ -228,13 +256,14 @@ export class PlayersView {
     // Los filtros pendientes solo se aplican en el primer render tras volver.
     this.pendingFilters = null;
 
-    const searchVal = this.container.querySelector("#filter-search")?.value?.toLowerCase() || "";
-    const teamVal = this.container.querySelector("#filter-team")?.value || "";
-    const posVal = this.container.querySelector("#filter-position")?.value || "";
+const searchVal = this.container.querySelector("#filter-search")?.value?.toLowerCase() || "";
+     const teamVal = this.container.querySelector("#filter-team")?.value || "";
+     const posVal = this.container.querySelector("#filter-position")?.value || "";
+     const activoVal = this.container.querySelector("#filter-activo")?.value || "";
 
-    this.#updateFilterCount(searchVal, teamVal, posVal);
+     this.#updateFilterCount(searchVal, teamVal, posVal, activoVal);
 
-    const filtered = this.#filterPlayers(allPlayers, searchVal, teamVal, posVal);
+     const filtered = this.#filterPlayers(allPlayers, searchVal, teamVal, posVal, activoVal);
 
     this.container.querySelectorAll("#player-list, #player-empty").forEach((el) => el.remove());
 
@@ -280,14 +309,15 @@ export class PlayersView {
       };
       card.addEventListener("click", () => {
         // Guarda filtros y scroll antes de ir al detalle.
-        saveListState("/players", {
-          filters: {
-            search: this.container.querySelector("#filter-search")?.value || "",
-            team: this.container.querySelector("#filter-team")?.value || "",
-            position: this.container.querySelector("#filter-position")?.value || "",
-          },
-          scrollTop: window.scrollY,
-        });
+saveListState("/players", {
+           filters: {
+             search: this.container.querySelector("#filter-search")?.value || "",
+             team: this.container.querySelector("#filter-team")?.value || "",
+             position: this.container.querySelector("#filter-position")?.value || "",
+             activo: this.container.querySelector("#filter-activo")?.value || "",
+           },
+           scrollTop: window.scrollY,
+         });
         this.router.navigateTo(`/player/${p.id}`);
       });
       list.appendChild(card);
@@ -319,22 +349,23 @@ export class PlayersView {
     this.resultsSection.appendChild(list);
   }
 
-  #filterPlayers(players, search, teamId, position) {
-    return players.filter((p) => {
-      if (search && !p.name?.toLowerCase().includes(search)) return false;
-      if (teamId && p.teamId != teamId) return false;
-      if (position && p.position !== position) return false;
-      return true;
-    });
-  }
+#filterPlayers(players, search, teamId, position, activo) {
+     return players.filter((p) => {
+       if (search && !p.name?.toLowerCase().includes(search)) return false;
+       if (teamId && p.teamId != teamId) return false;
+       if (position && p.position !== position) return false;
+       if (activo && activo !== "" && String(p.activo) !== activo) return false;
+       return true;
+     });
+   }
 
   // Refleja en el toggle cuántos filtros están activos (p. ej. "Filtros · 2").
-  #updateFilterCount(searchVal, teamVal, posVal) {
-    const el = this.container?.querySelector(".filter-panel-wrap .filter-count");
-    if (!el) return;
-    const active = [searchVal, teamVal, posVal].filter(Boolean).length;
-    el.textContent = active ? `· ${active}` : "";
-  }
+#updateFilterCount(searchVal, teamVal, posVal, activoVal) {
+     const el = this.container?.querySelector(".filter-panel-wrap .filter-count");
+     if (!el) return;
+     const active = [searchVal, teamVal, posVal, activoVal].filter(Boolean).length;
+     el.textContent = active ? `· ${active}` : "";
+   }
 
   async #deletePlayer(e, playerId, playerHasEvents) {
     e.stopPropagation();

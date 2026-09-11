@@ -4,6 +4,8 @@ import "../components/player-card.js";
 import "../components/player-form.js";
 import { getSportTerms } from "../sports-terms.js";
 import { formatDate } from "../utils/helpers.js";
+import { exportTeamRoster, importTeamRoster } from "../core/excel-io.js";
+import { showToast } from "../components/toast.js";
 
 export class TeamDetailView {
   constructor({ router, id }) {
@@ -262,8 +264,47 @@ export class TeamDetailView {
       this.container.appendChild(form);
     });
 
+    const exportBtn = document.createElement("button");
+    exportBtn.className = "btn btn-sm btn-success";
+    exportBtn.textContent = "📥 Exportar Excel";
+    exportBtn.addEventListener("click", async () => {
+      try {
+        await exportTeamRoster(team.id);
+        showToast("Plantilla exportada correctamente", "success");
+      } catch (err) {
+        showToast("Error al exportar: " + err.message, "error");
+      }
+    });
+
+    const importBtn = document.createElement("button");
+    importBtn.className = "btn btn-sm btn-info";
+    importBtn.textContent = "📤 Importar Excel";
+    importBtn.addEventListener("click", () => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".xlsx,.xls,.csv";
+      input.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+          const results = await importTeamRoster(team.id, file);
+          showToast(`Importación completada: ${results.created} creados, ${results.updated} actualizados${results.errors.length ? ", " + results.errors.length + " errores" : ""}`, results.errors.length ? "warning" : "success");
+          this.render();
+        } catch (err) {
+          showToast("Error al importar: " + err.message, "error");
+        }
+      });
+      input.click();
+    });
+
+    const actionsContainer = document.createElement("div");
+    actionsContainer.style.cssText = "display:flex;gap:0.5rem;flex-wrap:wrap;";
+    actionsContainer.appendChild(exportBtn);
+    actionsContainer.appendChild(importBtn);
+    actionsContainer.appendChild(addBtn);
+
     heading.appendChild(h2);
-    heading.appendChild(addBtn);
+    heading.appendChild(actionsContainer);
 
     const panel = document.createElement("div");
     panel.className = "detail-panel";

@@ -73,6 +73,20 @@
   color: var(--accent-soft);
 }
 
+.detail-cedula,
+.detail-fecha {
+  font-size: 0.8rem;
+  color: var(--text-faint);
+}
+
+.detail-fecha::before {
+  content: "📅 ";
+}
+
+.detail-cedula::before {
+  content: "🪪 ";
+}
+
 /* Team color dots */
 .team-color-dots {
   display: inline-flex;

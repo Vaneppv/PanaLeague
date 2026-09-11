@@ -58,6 +58,24 @@ class PlayerForm extends HTMLElement {
       group.appendChild(input);
     });
 
+    addFormGroup("Cédula", (group) => {
+      const input = document.createElement("input");
+      input.className = "form-input";
+      input.id = "player-cedula";
+      input.name = "cedula";
+      input.placeholder = "Opcional";
+      group.appendChild(input);
+    });
+
+    addFormGroup("Fecha de nacimiento", (group) => {
+      const input = document.createElement("input");
+      input.className = "form-input";
+      input.type = "date";
+      input.id = "player-fechaNacimiento";
+      input.name = "fechaNacimiento";
+      group.appendChild(input);
+    });
+
     const row = document.createElement("div");
     row.className = "form-row";
 
@@ -95,6 +113,20 @@ class PlayerForm extends HTMLElement {
     row.appendChild(numberGroup);
     row.appendChild(posGroup);
     form.appendChild(row);
+
+    const activoGroup = document.createElement("div");
+    activoGroup.className = "form-group";
+    const activoLabel = document.createElement("label");
+    activoLabel.className = "form-label checkbox-label";
+    const activoInput = document.createElement("input");
+    activoInput.type = "checkbox";
+    activoInput.id = "player-activo";
+    activoInput.name = "activo";
+    activoInput.checked = true;
+    activoLabel.appendChild(activoInput);
+    activoLabel.appendChild(document.createTextNode(" Activo / Titular"));
+    activoGroup.appendChild(activoLabel);
+    form.appendChild(activoGroup);
 
     addFormGroup("Equipo", (group) => {
       const select = document.createElement("select");
@@ -177,9 +209,12 @@ class PlayerForm extends HTMLElement {
     const form = this.querySelector("#player-form");
     form.name.value = player.name || "";
     form.photo.value = player.photo || "";
+    form.cedula.value = player.cedula || "";
+    form.fechaNacimiento.value = player.fechaNacimiento || "";
     form.number.value = player.number || "";
     form.position.value = player.position || "";
     form.teamId.value = player.teamId || "";
+    form.activo.checked = player.activo !== false;
   }
 
   async #handleSubmit(e) {
@@ -188,9 +223,12 @@ class PlayerForm extends HTMLElement {
     const data = {
       name: form.name.value.trim(),
       photo: form.photo.value.trim(),
+      cedula: form.cedula.value.trim(),
+      fechaNacimiento: form.fechaNacimiento.value,
       number: Number(form.number.value),
       position: form.position.value.trim(),
       teamId: Number(form.teamId.value),
+      activo: form.activo.checked,
     };
 
     if (!data.name || !data.teamId) return;

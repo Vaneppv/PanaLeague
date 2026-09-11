@@ -475,6 +475,28 @@ footer .db-status.error {
   box-shadow: 0 0 16px rgba(239, 68, 68, 0.6);
 }
 
+.btn-success {
+  background: #16a34a;
+  color: #fff;
+  box-shadow: 0 0 8px rgba(22, 163, 74, 0.4);
+}
+
+.btn-success:hover {
+  background: #15803d;
+  box-shadow: 0 0 16px rgba(22, 163, 74, 0.6);
+}
+
+.btn-info {
+  background: #0891b2;
+  color: #fff;
+  box-shadow: 0 0 8px rgba(8, 145, 178, 0.4);
+}
+
+.btn-info:hover {
+  background: #0e7490;
+  box-shadow: 0 0 16px rgba(8, 145, 178, 0.6);
+}
+
 .btn-sm {
   padding: 0.35rem 0.65rem;
   font-size: 0.8rem;
@@ -617,6 +639,11 @@ footer .db-status.error {
   background: var(--surface-hover);
   border: 1px solid var(--accent);
   box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.3);
+}
+.custom-toast.warning {
+  background: #2e2a1a;
+  border: 1px solid #eab308;
+  box-shadow: 0 0 12px rgba(234, 179, 8, 0.3);
 }
 
 .custom-toast.hide {

@@ -2,6 +2,7 @@ import db from "../db.js";
 import "../components/chart-container.js";
 import { getSportTerms } from "../sports-terms.js";
 import { formatDate } from "../utils/helpers.js";
+import { showToast } from "../components/toast.js";
 
 export class PlayerDetailView {
   constructor({ router, id }) {
@@ -109,12 +110,43 @@ export class PlayerDetailView {
       meta.appendChild(position);
     }
 
+    if (player.cedula) {
+      const cedula = document.createElement("span");
+      cedula.className = "detail-cedula";
+      cedula.textContent = `Cédula: ${player.cedula}`;
+      meta.appendChild(cedula);
+    }
+
+    if (player.fechaNacimiento) {
+      const fecha = document.createElement("span");
+      fecha.className = "detail-fecha";
+      const age = this.#calcAge(player.fechaNacimiento);
+      fecha.textContent = `${player.fechaNacimiento}${age ? ` (${age} años)` : ""}`;
+      meta.appendChild(fecha);
+    }
+
     info.appendChild(h1);
     info.appendChild(meta);
 
     if (team) {
       info.appendChild(this.#renderTeamLink(team));
     }
+
+    const toggleBtn = document.createElement("button");
+    toggleBtn.className = "btn btn-sm btn-secondary";
+    toggleBtn.textContent = player.activo !== false ? "Desactivar" : "Activar";
+    toggleBtn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const newStatus = player.activo === false;
+      try {
+        await db.put("players", { ...player, activo: newStatus });
+        showToast(`Jugador ${newStatus ? "activado" : "desactivado"}`, "success");
+        this.render();
+      } catch (err) {
+        showToast("Error al cambiar estado: " + err.message, "error");
+      }
+    });
+    info.appendChild(toggleBtn);
 
     header.appendChild(avatar);
     header.appendChild(info);
@@ -348,6 +380,16 @@ export class PlayerDetailView {
     section.appendChild(h2);
     section.appendChild(panel);
     return section;
+  }
+
+  #calcAge(fechaNacimiento) {
+    if (!fechaNacimiento) return "";
+    const today = new Date();
+    const birth = new Date(fechaNacimiento);
+    let age = today.getFullYear() - birth.getFullYear();
+    const m = today.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+    return age;
   }
 
   #resultOf(match) {

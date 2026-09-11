@@ -97,6 +97,28 @@
   max-width: 120px;
 }
 
+.player-inactive-badge {
+  display: inline-block;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  margin-top: 0.25rem;
+}
+
+.player-active-badge {
+  display: inline-block;
+  background: #16a34a;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  margin-top: 0.25rem;
+}
+
 .player-form-dialog {
   background: var(--surface);
   border-radius: 12px;
