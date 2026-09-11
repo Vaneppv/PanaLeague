@@ -128,6 +128,9 @@ export class PlayerDetailView {
     info.appendChild(h1);
     info.appendChild(meta);
 
+    const statusRow = document.createElement("div");
+    statusRow.className = "detail-status-row";
+
     if (team) {
       info.appendChild(this.#renderTeamLink(team));
     }
@@ -137,16 +140,19 @@ export class PlayerDetailView {
     toggleBtn.textContent = player.activo !== false ? "Desactivar" : "Activar";
     toggleBtn.addEventListener("click", async (e) => {
       e.stopPropagation();
-      const newStatus = player.activo === false;
       try {
-        await db.put("players", { ...player, activo: newStatus });
+        const currentPlayer = await db.getById("players", Number(this.id));
+        if (!currentPlayer) return;
+        const newStatus = currentPlayer.activo === false;
+        await db.put("players", { ...currentPlayer, activo: newStatus });
         showToast(`Jugador ${newStatus ? "activado" : "desactivado"}`, "success");
         this.render();
       } catch (err) {
         showToast("Error al cambiar estado: " + err.message, "error");
       }
     });
-    info.appendChild(toggleBtn);
+    statusRow.appendChild(toggleBtn);
+    info.appendChild(statusRow);
 
     header.appendChild(avatar);
     header.appendChild(info);

@@ -68,6 +68,12 @@
   margin-bottom: 0.5rem;
 }
 
+.detail-status-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
 .detail-number {
   font-weight: 600;
   color: var(--accent-soft);
