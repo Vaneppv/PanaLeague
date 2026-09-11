@@ -79,6 +79,7 @@ export class PlayerDetailView {
 
     const loader = container.querySelector("loading-state");
     if (loader) loader.remove();
+    container.querySelector(".player-detail")?.remove();
     container.appendChild(section);
   }
 
