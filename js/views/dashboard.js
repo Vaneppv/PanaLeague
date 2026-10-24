@@ -5,7 +5,16 @@ import "../components/chart-container.js";
 import { getSportTerms } from "../sports-terms.js";
 import { formatDate } from "../utils/helpers.js";
 
-const PALETTE = ["#6c5ce7", "#22c55e", "#60a5fa", "#f97316", "#eab308", "#ef4444", "#ec4899", "#14b8a6"];
+const PALETTE = [
+  "#6c5ce7",
+  "#22c55e",
+  "#60a5fa",
+  "#f97316",
+  "#eab308",
+  "#ef4444",
+  "#ec4899",
+  "#14b8a6",
+];
 
 export class DashboardView {
   constructor({ router }) {
@@ -95,17 +104,18 @@ export class DashboardView {
       content.appendChild(
         league.modalidad === "tournament"
           ? this.#buildBracketSummary(matches, this.#teamById(teams))
-          : this.#buildMiniStandings(teams, matches, terms)
+          : this.#buildMiniStandings(teams, matches, terms),
       );
+      if (league.modalidad === "league") {
+        content.appendChild(this.#buildScheduleList(matches, this.#teamById(teams), terms));
+      }
       content.appendChild(this.#buildCharts(teams, matches, terms));
     }
   }
 
   #isFinalized(match) {
     return (
-      match.status === "Finalizado" ||
-      match.status === "finalized" ||
-      match.status === "finished"
+      match.status === "Finalizado" || match.status === "finalized" || match.status === "finished"
     );
   }
 
@@ -360,10 +370,7 @@ export class DashboardView {
     const rows = teams
       .map((team) => ({ team, stats: this.#computeStats(matches, team.id) }))
       .sort(
-        (a, b) =>
-          b.stats.pts - a.stats.pts ||
-          b.stats.dif - a.stats.dif ||
-          b.stats.pf - a.stats.pf
+        (a, b) => b.stats.pts - a.stats.pts || b.stats.dif - a.stats.dif || b.stats.pf - a.stats.pf,
       )
       .slice(0, 5);
 
@@ -418,6 +425,39 @@ export class DashboardView {
     return section;
   }
 
+  #buildScheduleList(matches, teamById, terms) {
+    const section = document.createElement("section");
+    section.className = "detail-section";
+    section.appendChild(this.#sectionTitle("Calendario de partidos"));
+
+    const panel = document.createElement("div");
+    panel.className = "detail-panel";
+
+    if (matches.length === 0) {
+      panel.appendChild(this.#emptyMsg("Aún no hay partidos programados."));
+      section.appendChild(panel);
+      return section;
+    }
+
+    const byRound = new Map();
+    matches.forEach((m) => {
+      const r = m.round || 1;
+      if (!byRound.has(r)) byRound.set(r, []);
+      byRound.get(r).push(m);
+    });
+
+    const rounds = Array.from(byRound.keys()).sort((a, b) => a - b);
+
+    rounds.forEach((r) => {
+      const roundMatches = byRound.get(r);
+      panel.appendChild(this.#roundBlock(`Ronda ${r}`, roundMatches, teamById));
+    });
+
+    panel.appendChild(this.#viewAllLink("/matches", "Ver todos los partidos"));
+    section.appendChild(panel);
+    return section;
+  }
+
   #buildBracketSummary(matches, teamById) {
     const section = document.createElement("section");
     section.className = "detail-section";
@@ -451,12 +491,11 @@ export class DashboardView {
 
     if (lastFinalized != null) {
       panel.appendChild(
-        this.#roundBlock(`Ronda ${lastFinalized} finalizada`, byRound.get(lastFinalized), teamById)
+        this.#roundBlock(`Ronda ${lastFinalized} finalizada`, byRound.get(lastFinalized), teamById),
       );
     }
 
-    const nextRound =
-      lastFinalized == null ? rounds[0] : rounds[rounds.indexOf(lastFinalized) + 1];
+    const nextRound = lastFinalized == null ? rounds[0] : rounds[rounds.indexOf(lastFinalized) + 1];
 
     if (nextRound != null) {
       const isFirst = nextRound === rounds[0];
@@ -464,8 +503,8 @@ export class DashboardView {
         this.#roundBlock(
           isFirst ? `Ronda ${nextRound} por jugarse` : `Ronda ${nextRound} (próxima)`,
           byRound.get(nextRound),
-          teamById
-        )
+          teamById,
+        ),
       );
     }
 
@@ -577,26 +616,30 @@ export class DashboardView {
       return this.#buildChartCard(title, null, "No hay datos suficientes.");
     }
 
-    return this.#buildChartCard(title, {
-      type: "bar",
-      data: {
-        labels: rows.map((r) => r.team.name),
-        datasets: [
-          {
-            label: terms.gf || "PF",
-            data: rows.map((r) => r.pf),
-            backgroundColor: rows.map((r) => r.team.colorPrincipal || PALETTE[0]),
-            borderRadius: 6,
-          },
-        ],
+    return this.#buildChartCard(
+      title,
+      {
+        type: "bar",
+        data: {
+          labels: rows.map((r) => r.team.name),
+          datasets: [
+            {
+              label: terms.gf || "PF",
+              data: rows.map((r) => r.pf),
+              backgroundColor: rows.map((r) => r.team.colorPrincipal || PALETTE[0]),
+              borderRadius: 6,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+        },
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
-      },
-    }, null);
+      null,
+    );
   }
 
   #resultsChart(matches) {
@@ -619,27 +662,35 @@ export class DashboardView {
       return this.#buildChartCard(title, null, "No hay datos suficientes.");
     }
 
-    return this.#buildChartCard(title, {
-      type: "doughnut",
-      data: {
-        labels: ["Victorias", "Empates", "Derrotas"],
-        datasets: [
-          {
-            data,
-            backgroundColor: ["#22c55e", "#eab308", "#ef4444"],
-            borderColor: "#0a0a0f",
-            borderWidth: 2,
+    return this.#buildChartCard(
+      title,
+      {
+        type: "doughnut",
+        data: {
+          labels: ["Victorias", "Empates", "Derrotas"],
+          datasets: [
+            {
+              data,
+              backgroundColor: ["#22c55e", "#eab308", "#ef4444"],
+              borderColor: "#0a0a0f",
+              borderWidth: 2,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: "right",
+              labels: { color: "#8888aa", boxWidth: 12 },
+            },
           },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: true, position: "right", labels: { color: "#8888aa", boxWidth: 12 } },
         },
       },
-    }, null);
+      null,
+    );
   }
 
   #pointsTimelineChart(teams, matches) {
@@ -654,7 +705,7 @@ export class DashboardView {
     }
 
     const labels = played.map((m, i) =>
-      m.date ? new Date(m.date).toLocaleDateString("es-ES") : `P${i + 1}`
+      m.date ? new Date(m.date).toLocaleDateString("es-ES") : `P${i + 1}`,
     );
 
     const teamIds = new Set();
@@ -696,18 +747,22 @@ export class DashboardView {
       };
     });
 
-    return this.#buildChartCard(title, {
-      type: "line",
-      data: { labels, datasets },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: true, labels: { color: "#8888aa", boxWidth: 12 } },
+    return this.#buildChartCard(
+      title,
+      {
+        type: "line",
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: true, labels: { color: "#8888aa", boxWidth: 12 } },
+          },
+          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
         },
-        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
       },
-    }, null);
+      null,
+    );
   }
 
   openLeagueSwitcher() {

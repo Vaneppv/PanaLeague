@@ -1,7 +1,7 @@
 import db from "../db.js";
 import "../components/league-form.js";
 import { showToast } from "../components/toast.js";
-import { generateRoundRobin, generateBracket } from "../utils/helpers.js";
+import { generateRoundRobin, generateBracket, shuffle } from "../utils/helpers.js";
 import { saveListState, readListState, clearListState } from "../utils/nav-state.js";
 import { getSportTerms } from "../sports-terms.js";
 import { exportLeague, importLeague } from "../core/league-io.js";
@@ -156,7 +156,8 @@ export class LeaguesView {
             return;
           }
 
-          const matches = generateRoundRobin(teams, league.rounds || 1);
+          const shuffledTeams = shuffle(teams);
+          const matches = generateRoundRobin(shuffledTeams, league.rounds || 1);
 
           await db.runTransaction(["matches"], "readwrite", (stores) => {
             matches.forEach((m) => {
@@ -205,9 +206,11 @@ export class LeaguesView {
             return;
           }
 
+          const shuffledTeams = shuffle(teams);
+
           let matches;
           try {
-            matches = generateBracket(teams);
+            matches = generateBracket(shuffledTeams);
           } catch (err) {
             showToast(err.message, "error");
             btn.disabled = false;

@@ -6,6 +6,15 @@ export function debounce(fn, delay = 300) {
   };
 }
 
+export function shuffle(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 export function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
 }
