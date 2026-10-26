@@ -88,7 +88,7 @@ export class MatchesView {
     section.appendChild(layout);
 
     this.#updateFilterCount();
-    container.appendChild(section);
+    container.replaceChildren(section);
   }
 
   // Filtros: estado, equipo, fecha (desde/hasta) y ronda en torneo.
@@ -399,6 +399,23 @@ export class MatchesView {
     dateGroup.appendChild(dateInput);
     form.appendChild(dateGroup);
 
+    const locationGroup = document.createElement("div");
+    locationGroup.className = "form-group";
+    const locationLabel = document.createElement("label");
+    locationLabel.className = "form-label";
+    locationLabel.htmlFor = "match-location";
+    locationLabel.textContent = "Ubicación (opcional)";
+    const locationInput = document.createElement("input");
+    locationInput.className = "form-input";
+    locationInput.type = "text";
+    locationInput.id = "match-location";
+    locationInput.name = "location";
+    locationInput.placeholder = "Estadio, sede, etc.";
+    if (match?.location) locationInput.value = match.location;
+    locationGroup.appendChild(locationLabel);
+    locationGroup.appendChild(locationInput);
+    form.appendChild(locationGroup);
+
     const actions = document.createElement("div");
     actions.className = "dialog-actions";
 
@@ -477,8 +494,9 @@ export class MatchesView {
 
     // En torneo solo se actualiza la fecha; los equipos los fija el bracket.
     if (onlyDate) {
+      const locationValue = form.location?.value?.trim() || "";
       try {
-        await db.put("matches", { ...match, date: isoDate });
+        await db.put("matches", { ...match, date: isoDate, location: locationValue });
         showToast("Fecha actualizada", "success");
       } catch (err) {
         showToast("No se pudo actualizar la fecha", "error");
@@ -513,6 +531,7 @@ export class MatchesView {
       return;
     }
 
+    const locationValue = form.location?.value?.trim() || "";
     try {
       if (match) {
         await db.put("matches", {
@@ -520,6 +539,7 @@ export class MatchesView {
           homeTeamId: homeId,
           awayTeamId: awayId,
           date: isoDate,
+          location: locationValue,
         });
         showToast("Partido actualizado", "success");
       } else {
@@ -528,6 +548,7 @@ export class MatchesView {
           homeTeamId: homeId,
           awayTeamId: awayId,
           date: isoDate,
+          location: locationValue,
           status: "Programado",
           homeScore: null,
           awayScore: null,

@@ -58,6 +58,12 @@ export class MatchCard extends HTMLElement {
     const date = document.createElement("span");
     date.className = "match-date";
     date.textContent = m.date ? formatDate(m.date) : "Sin fecha";
+    if (m.location) {
+      const location = document.createElement("span");
+      location.className = "match-location";
+      location.textContent = ` · ${m.location}`;
+      date.appendChild(location);
+    }
     top.appendChild(date);
 
     const status = document.createElement("span");

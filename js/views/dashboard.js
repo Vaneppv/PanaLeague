@@ -231,8 +231,13 @@ export class DashboardView {
 
     const date = document.createElement("div");
     date.className = "dash-date";
-    date.textContent = match.date ? formatDate(match.date) : "Sin fecha programada";
+    date.textContent = match.date ? formatDate(match.date) : "Sin fecha";
     card.appendChild(date);
+
+    const loc = document.createElement("div");
+    loc.className = "dash-location";
+    loc.textContent = match.location || "Sin ubicación";
+    card.appendChild(loc);
 
     card.classList.add("clickable");
     card.addEventListener("click", () => this.router.navigateTo(`/match/${match.id}`));
@@ -275,7 +280,17 @@ export class DashboardView {
       date.className = "dash-date";
       date.textContent = formatDate(match.date);
       card.appendChild(date);
+    } else {
+      const date = document.createElement("div");
+      date.className = "dash-date";
+      date.textContent = "Sin fecha";
+      card.appendChild(date);
     }
+
+    const loc = document.createElement("div");
+    loc.className = "dash-location";
+    loc.textContent = match.location || "Sin ubicación";
+    card.appendChild(loc);
 
     card.classList.add("clickable");
     card.addEventListener("click", () => this.router.navigateTo(`/match/${match.id}`));
@@ -530,6 +545,16 @@ export class DashboardView {
       li.addEventListener("click", () => this.router.navigateTo(`/match/${m.id}`));
 
       const played = this.#isFinalized(m) && m.homeScore != null && m.awayScore != null;
+
+      // Date/location meta row
+      const meta = document.createElement("div");
+      meta.className = "dash-round-meta";
+      meta.textContent = m.date ? formatDate(m.date) : "Sin fecha";
+      const loc = document.createElement("span");
+      loc.className = "dash-round-location";
+      loc.textContent = ` · ${m.location || "Sin ubicación"}`;
+      meta.appendChild(loc);
+      li.appendChild(meta);
 
       li.appendChild(this.#teamChip(teamById[m.homeTeamId]));
 

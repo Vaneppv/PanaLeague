@@ -1,6 +1,6 @@
 import db from "../db.js";
 import "../components/event-form.js";
-import "../components/confirm-dialog.js";
+import { ConfirmDialog } from "../components/confirm-dialog.js";
 import { finalizeMatch, undoMatch } from "../core/match-ops.js";
 import { getSportTerms } from "../sports-terms.js";
 import { formatDate, roundLabel } from "../utils/helpers.js";
@@ -48,6 +48,8 @@ export class MatchDetailView {
       db.getById("teams", match.awayTeamId),
       db.getByIndex("teams", "leagueId", match.leagueId),
     ]);
+
+    this.allTeams = allTeams;
 
     const [homePlayers, awayPlayers] = await Promise.all([
       homeTeam ? db.getByIndex("players", "teamId", homeTeam.id) : [],
@@ -119,6 +121,7 @@ export class MatchDetailView {
     meta.className = "match-meta";
     const parts = [
       match.date ? formatDate(match.date) : "Sin fecha",
+      match.location || "",
       match.status,
       league?.modalidad === "tournament" ? roundLabel(match.round, totalTeams) : "",
     ];
@@ -251,6 +254,14 @@ export class MatchDetailView {
     const wrap = document.createElement("div");
     wrap.className = "match-actions";
 
+    if (match.status !== "Finalizado") {
+      const editBtn = document.createElement("button");
+      editBtn.className = "btn btn-secondary";
+      editBtn.textContent = "Editar";
+      editBtn.addEventListener("click", () => this.#openEditForm(match));
+      wrap.appendChild(editBtn);
+    }
+
     const finalizeBtn = document.createElement("button");
     finalizeBtn.className = "btn btn-primary";
     finalizeBtn.textContent = "Finalizar partido";
@@ -342,5 +353,161 @@ export class MatchDetailView {
 
     wrap.appendChild(btn);
     return wrap;
+  }
+
+  // Diálogo editar partido (local, visitante, fecha, ubicación).
+  #openEditForm(match) {
+    const overlay = document.createElement("div");
+    overlay.className = "dialog-overlay";
+
+    const dialog = document.createElement("div");
+    dialog.className = "league-form-dialog";
+
+    const h3 = document.createElement("h3");
+    h3.textContent = "Editar Partido";
+    dialog.appendChild(h3);
+
+    const form = document.createElement("form");
+
+    form.appendChild(this.#selectGroup("Equipo local", "home", match?.homeTeamId));
+    form.appendChild(this.#selectGroup("Equipo visitante", "away", match?.awayTeamId));
+
+    const dateGroup = document.createElement("div");
+    dateGroup.className = "form-group";
+    const dateLabel = document.createElement("label");
+    dateLabel.className = "form-label";
+    dateLabel.htmlFor = "match-date";
+    dateLabel.textContent = "Fecha y hora";
+    const dateInput = document.createElement("input");
+    dateInput.className = "form-input";
+    dateInput.type = "datetime-local";
+    dateInput.id = "match-date";
+    dateInput.name = "date";
+    dateInput.required = true;
+    if (match?.date) dateInput.value = match.date.slice(0, 16);
+    dateGroup.appendChild(dateLabel);
+    dateGroup.appendChild(dateInput);
+    form.appendChild(dateGroup);
+
+    const locationGroup = document.createElement("div");
+    locationGroup.className = "form-group";
+    const locationLabel = document.createElement("label");
+    locationLabel.className = "form-label";
+    locationLabel.htmlFor = "match-location";
+    locationLabel.textContent = "Ubicación (opcional)";
+    const locationInput = document.createElement("input");
+    locationInput.className = "form-input";
+    locationInput.type = "text";
+    locationInput.id = "match-location";
+    locationInput.name = "location";
+    locationInput.placeholder = "Estadio, sede, etc.";
+    if (match?.location) locationInput.value = match.location;
+    locationGroup.appendChild(locationLabel);
+    locationGroup.appendChild(locationInput);
+    form.appendChild(locationGroup);
+
+    const actions = document.createElement("div");
+    actions.className = "dialog-actions";
+
+    const cancelBtn = document.createElement("button");
+    cancelBtn.type = "button";
+    cancelBtn.className = "btn btn-secondary";
+    cancelBtn.textContent = "Cancelar";
+    cancelBtn.addEventListener("click", () => overlay.remove());
+
+    const submitBtn = document.createElement("button");
+    submitBtn.type = "submit";
+    submitBtn.className = "btn btn-primary";
+    submitBtn.textContent = "Guardar";
+
+    actions.appendChild(cancelBtn);
+    actions.appendChild(submitBtn);
+    form.appendChild(actions);
+
+    form.addEventListener("submit", (e) => this.#handleEditFormSubmit(e, match, overlay));
+
+    dialog.appendChild(form);
+    overlay.appendChild(dialog);
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) overlay.remove();
+    });
+    this.container.appendChild(overlay);
+  }
+
+  #selectGroup(label, name, selectedId) {
+    const group = document.createElement("div");
+    group.className = "form-group";
+
+    const lbl = document.createElement("label");
+    lbl.className = "form-label";
+    lbl.htmlFor = `match-${name}`;
+    lbl.textContent = label;
+
+    const sel = document.createElement("select");
+    sel.className = "form-select";
+    sel.id = `match-${name}`;
+    sel.name = name;
+    sel.required = true;
+
+    const empty = document.createElement("option");
+    empty.value = "";
+    empty.textContent = "Seleccionar...";
+    sel.appendChild(empty);
+
+    const allTeams = this.allTeams || [];
+    allTeams.forEach((t) => {
+      const opt = document.createElement("option");
+      opt.value = t.id;
+      opt.textContent = t.name;
+      sel.appendChild(opt);
+    });
+
+    if (selectedId) sel.value = selectedId;
+
+    group.appendChild(lbl);
+    group.appendChild(sel);
+    return group;
+  }
+
+  async #handleEditFormSubmit(e, match, overlay) {
+    e.preventDefault();
+    const form = e.target;
+
+    const dateValue = form.date.value;
+    if (!dateValue) {
+      showToast("La fecha y hora son obligatorias", "error");
+      return;
+    }
+
+    const isoDate = new Date(dateValue).toISOString();
+
+    const homeId = Number(form.home.value);
+    const awayId = Number(form.away.value);
+
+    if (!homeId || !awayId) {
+      showToast("Selecciona ambos equipos", "error");
+      return;
+    }
+    if (homeId === awayId) {
+      showToast("Un equipo no puede enfrentarse a sí mismo", "error");
+      return;
+    }
+
+    const locationValue = form.location?.value?.trim() || "";
+
+    try {
+      await db.put("matches", {
+        ...match,
+        homeTeamId: homeId,
+        awayTeamId: awayId,
+        date: isoDate,
+        location: locationValue,
+      });
+      showToast("Partido actualizado", "success");
+      overlay.remove();
+      this.render();
+    } catch (err) {
+      showToast("No se pudo guardar el partido", "error");
+    }
   }
 }
